@@ -44,7 +44,7 @@ class _CurrecnyConvertorMaterialPagee
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
-              result.toString(),
+              'INR ${result.toString()}',
               style: const TextStyle(
                 fontSize: 45,
                 fontWeight: FontWeight.bold,
