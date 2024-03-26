@@ -15,6 +15,11 @@ class _CurrecnyConvertorMaterialPagee
     extends State<CurrencyConvertorMaterialPagee> {
   final TextEditingController textEditingController = TextEditingController();
   double result = 0;
+  void convert() {
+    result = double.parse(textEditingController.text) * 81;
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
     const border = OutlineInputBorder(
@@ -32,10 +37,13 @@ class _CurrecnyConvertorMaterialPagee
       appBar: AppBar(
         backgroundColor: const Color.fromRGBO(122, 167, 152, 1),
         elevation: 0,
+        centerTitle: true,
         title: const Text(
           'currecny convertor',
+          textAlign: TextAlign.center,
           style: TextStyle(
             color: Color.fromARGB(255, 0, 0, 0),
+            fontSize: 30,
           ),
         ),
       ),
@@ -44,7 +52,7 @@ class _CurrecnyConvertorMaterialPagee
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
-              'INR ${result.toString()}',
+              'INR ${result != 0 ? result.toStringAsFixed(2) : result.toStringAsFixed(0)}',
               style: const TextStyle(
                 fontSize: 45,
                 fontWeight: FontWeight.bold,
@@ -78,11 +86,7 @@ class _CurrecnyConvertorMaterialPagee
             Padding(
               padding: const EdgeInsets.all(10.0),
               child: TextButton(
-                onPressed: () {
-                  setState(() {
-                    result = double.parse(textEditingController.text) * 81;
-                  });
-                },
+                onPressed: convert,
                 style: TextButton.styleFrom(
                   backgroundColor: Colors.black,
                   foregroundColor: const Color.fromARGB(255, 255, 255, 255),
