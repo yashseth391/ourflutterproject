@@ -71,48 +71,23 @@ class _UserPageState extends State<UserPage> {
             ),
             SizedBox(height: 20),
             ElevatedButton(
-              onPressed: () {
+              onPressed: () async {
                 // Process the weight and location entered by the user
                 double weight = double.tryParse(weightController.text) ?? 0.0;
                 String location = locationController.text.trim();
 
-                // Calculate the amount
-                double amount = weight * 14;
+                // Open the Hive box
+                var box = await Hive.openBox('users');
 
-                // Store location in Hive
-                _storeLocation(location);
+                // Store the username and location together in the Hive box
+                box.put(location, weight);
 
-                // Display message with response and amount
-                showDialog(
-                  context: context,
-                  builder: (BuildContext context) {
-                    return AlertDialog(
-                      title: Text('Response'),
-                      content: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text('Submitted successfully!'),
-                          SizedBox(height: 10),
-                          Text(
-                              'You can get approximately \$${amount.toStringAsFixed(2)}.'),
-                        ],
-                      ),
-                      actions: [
-                        TextButton(
-                          onPressed: () {
-                            Navigator.pop(context); // Close the dialog
-                          },
-                          child: Text('OK'),
-                        ),
-                      ],
-                    );
-                  },
+                // Display confirmation message
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('Response submitted.'),
+                  ),
                 );
-
-                // Clear the form fields
-                weightController.clear();
-                locationController.clear();
               },
               child: Text('Submit'),
             ),
@@ -120,11 +95,6 @@ class _UserPageState extends State<UserPage> {
         ),
       ),
     );
-  }
-
-  void _storeLocation(String location) async {
-    var box = await Hive.openBox('locations');
-    box.add(location);
   }
 }
 
@@ -543,8 +513,11 @@ class Dashboard extends StatelessWidget {
                 itemCount: users.length,
                 itemBuilder: (BuildContext context, int index) {
                   String username = users[index];
+
+                  String location = usersBox.get(username, defaultValue: '14');
                   return ListTile(
                     title: Text(username),
+                    subtitle: Text('Location: $location'),
                     trailing: IconButton(
                       icon: Icon(Icons.delete),
                       onPressed: () {
