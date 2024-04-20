@@ -27,8 +27,104 @@ class MyApp extends StatelessWidget {
         '/Sell': (context) => SellWastePage(),
         '/Estimate': (context) => EstimatedWeightPage(),
         '/Admin': (context) => AdminPage(),
+        '/User': (context) => UserPage(),
       },
     );
+  }
+}
+
+//User page
+
+class UserPage extends StatefulWidget {
+  @override
+  _UserPageState createState() => _UserPageState();
+}
+
+class _UserPageState extends State<UserPage> {
+  TextEditingController weightController = TextEditingController();
+  TextEditingController locationController = TextEditingController();
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('User Page'),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(20.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            TextField(
+              controller: weightController,
+              keyboardType: TextInputType.number,
+              decoration: InputDecoration(
+                labelText: 'Approximate Weight of Paper (in kg)',
+              ),
+            ),
+            SizedBox(height: 20),
+            TextField(
+              controller: locationController,
+              decoration: InputDecoration(
+                labelText: 'Pickup Location',
+              ),
+            ),
+            SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () {
+                // Process the weight and location entered by the user
+                double weight = double.tryParse(weightController.text) ?? 0.0;
+                String location = locationController.text.trim();
+
+                // Calculate the amount
+                double amount = weight * 14;
+
+                // Store location in Hive
+                _storeLocation(location);
+
+                // Display message with response and amount
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return AlertDialog(
+                      title: Text('Response'),
+                      content: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('Submitted successfully!'),
+                          SizedBox(height: 10),
+                          Text(
+                              'You can get approximately \$${amount.toStringAsFixed(2)}.'),
+                        ],
+                      ),
+                      actions: [
+                        TextButton(
+                          onPressed: () {
+                            Navigator.pop(context); // Close the dialog
+                          },
+                          child: Text('OK'),
+                        ),
+                      ],
+                    );
+                  },
+                );
+
+                // Clear the form fields
+                weightController.clear();
+                locationController.clear();
+              },
+              child: Text('Submit'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _storeLocation(String location) async {
+    var box = await Hive.openBox('locations');
+    box.add(location);
   }
 }
 
@@ -243,7 +339,7 @@ class _LoginPageState extends State<LoginPage> {
 
                     if (storedPassword.isNotEmpty &&
                         enteredPassword == storedPassword) {
-                      Navigator.pushNamed(context, '/home');
+                      Navigator.pushNamed(context, '/User');
                     } else {
                       showDialog(
                         context: context,
