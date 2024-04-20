@@ -74,18 +74,33 @@ class _UserPageState extends State<UserPage> {
               onPressed: () async {
                 // Process the weight and location entered by the user
                 double weight = double.tryParse(weightController.text) ?? 0.0;
-                String location = locationController.text.trim();
+                String location = locationController.text;
 
-                // Open the Hive box
-                var box = await Hive.openBox('users');
+                // Calculate the approximate amount based on weight
+                double approximateAmount = weight * 13;
 
-                // Store the username and location together in the Hive box
-                box.put(location, weight);
+                // Open the Hive box for users
+                var usersBox = await Hive.openBox('users');
+
+                // Get the username from the users box
+                String username = ''; // Initialize username variable
+                usersBox.keys.forEach((key) {
+                  if (usersBox.get(key) == location) {
+                    username = key;
+                  }
+                });
+
+                // Open the Hive box for users1
+                var users1Box = await Hive.openBox('users1');
+
+                // Store the username and location together in the users1 box
+                users1Box.put(username, location);
 
                 // Display confirmation message
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                    content: Text('Response submitted.'),
+                    content: Text(
+                        'Response submitted. You can get approximately ₹$approximateAmount.'),
                   ),
                 );
               },
@@ -157,6 +172,144 @@ class HomePage extends StatelessWidget {
                 child: Text('About us'),
               ),
             ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class SignupPage extends StatefulWidget {
+  @override
+  _SignupPageState createState() => _SignupPageState();
+}
+
+class _SignupPageState extends State<SignupPage> {
+  final TextEditingController usernameController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text(
+          'Signup',
+          style: TextStyle(color: Colors.black), // Text color
+        ),
+      ),
+      body: Container(
+        decoration: const BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage('images/bg.jpg'), // Path to your image asset
+            fit: BoxFit.cover,
+          ),
+        ),
+        child: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                const Text(
+                  'Signup Page',
+                  style: TextStyle(
+                    fontSize: 30.0,
+                    color: Colors.black, // Text color
+                    fontWeight: FontWeight.bold, // Bold font weight
+                  ),
+                ),
+                const SizedBox(height: 20.0),
+                TextField(
+                  style: TextStyle(
+                    color: Colors.black, // Set text color to black
+                    fontWeight: FontWeight.bold, // Bold font weight
+                  ),
+                  controller: usernameController,
+                  decoration: InputDecoration(
+                    filled: true,
+                    fillColor: Colors.white, // Background color
+                    labelText: 'Username',
+                    labelStyle: TextStyle(
+                      color: Colors.black, // Text color of the label
+                      fontWeight: FontWeight.bold, // Bold font weight
+                    ),
+                    border: OutlineInputBorder(
+                      borderSide: BorderSide.none, // No border
+                      borderRadius:
+                          BorderRadius.circular(10.0), // Rounded corners
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 20.0),
+                TextField(
+                  controller: passwordController,
+                  style: const TextStyle(
+                    color: Colors.white, // Text color of the input field
+                    fontWeight: FontWeight.bold, // Bold font weight
+                  ),
+                  decoration: InputDecoration(
+                    filled: true,
+                    fillColor: Colors.white, // Background color
+                    labelText: 'Password',
+                    labelStyle: const TextStyle(
+                      color: Colors.black, // Text color of the label
+                      fontWeight: FontWeight.bold, // Bold font weight
+                    ),
+                    border: OutlineInputBorder(
+                      borderSide: BorderSide.none, // No border
+                      borderRadius:
+                          BorderRadius.circular(10.0), // Rounded corners
+                    ),
+                  ),
+                  obscureText: true,
+                ),
+                const SizedBox(height: 20.0),
+                ElevatedButton(
+                  onPressed: () async {
+                    var box = await Hive.openBox(
+                        'users'); // Open a Hive box to store user data
+                    String username = usernameController
+                        .text; // Get the username from the text field
+                    String password = passwordController
+                        .text; // Get the password from the text field
+
+                    // Check if the username already exists in the box
+                    if (box.containsKey(username)) {
+                      // If the username already exists, display a snackbar
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                            'Username already exists! Please choose a different username.',
+                          ),
+                        ),
+                      );
+                    } else {
+                      // If the username does not exist, store the new username-password pair in the Hive box
+                      box.put(username, password);
+                      print(
+                          'Signup successful! Username: $username, Password: $password');
+                    }
+                  },
+                  child: const Text('Signup'),
+                ),
+                const SizedBox(height: 20.0),
+                ElevatedButton(
+                  onPressed: () {
+                    // Navigate back to login page
+                    Navigator.pop(context);
+                  },
+                  child: const Text('Back to Login'),
+                ),
+                const SizedBox(height: 20.0),
+                ElevatedButton(
+                  onPressed: () {
+                    // Navigate back to home page
+                    Navigator.popUntil(context, ModalRoute.withName('/'));
+                  },
+                  child: const Text('Back to Home'),
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -357,144 +510,6 @@ class _LoginPageState extends State<LoginPage> {
   }
 }
 
-class SignupPage extends StatefulWidget {
-  @override
-  _SignupPageState createState() => _SignupPageState();
-}
-
-class _SignupPageState extends State<SignupPage> {
-  final TextEditingController usernameController = TextEditingController();
-  final TextEditingController passwordController = TextEditingController();
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          'Signup',
-          style: TextStyle(color: Colors.black), // Text color
-        ),
-      ),
-      body: Container(
-        decoration: const BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage('images/bg.jpg'), // Path to your image asset
-            fit: BoxFit.cover,
-          ),
-        ),
-        child: Center(
-          child: Padding(
-            padding: const EdgeInsets.all(20.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                const Text(
-                  'Signup Page',
-                  style: TextStyle(
-                    fontSize: 30.0,
-                    color: Colors.black, // Text color
-                    fontWeight: FontWeight.bold, // Bold font weight
-                  ),
-                ),
-                const SizedBox(height: 20.0),
-                TextField(
-                  style: TextStyle(
-                    color: Colors.black, // Set text color to black
-                    fontWeight: FontWeight.bold, // Bold font weight
-                  ),
-                  controller: usernameController,
-                  decoration: InputDecoration(
-                    filled: true,
-                    fillColor: Colors.white, // Background color
-                    labelText: 'Username',
-                    labelStyle: TextStyle(
-                      color: Colors.black, // Text color of the label
-                      fontWeight: FontWeight.bold, // Bold font weight
-                    ),
-                    border: OutlineInputBorder(
-                      borderSide: BorderSide.none, // No border
-                      borderRadius:
-                          BorderRadius.circular(10.0), // Rounded corners
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 20.0),
-                TextField(
-                  controller: passwordController,
-                  style: const TextStyle(
-                    color: Colors.white, // Text color of the input field
-                    fontWeight: FontWeight.bold, // Bold font weight
-                  ),
-                  decoration: InputDecoration(
-                    filled: true,
-                    fillColor: Colors.white, // Background color
-                    labelText: 'Password',
-                    labelStyle: const TextStyle(
-                      color: Colors.black, // Text color of the label
-                      fontWeight: FontWeight.bold, // Bold font weight
-                    ),
-                    border: OutlineInputBorder(
-                      borderSide: BorderSide.none, // No border
-                      borderRadius:
-                          BorderRadius.circular(10.0), // Rounded corners
-                    ),
-                  ),
-                  obscureText: true,
-                ),
-                const SizedBox(height: 20.0),
-                ElevatedButton(
-                  onPressed: () async {
-                    var box = await Hive.openBox(
-                        'users'); // Open a Hive box to store user data
-                    String username = usernameController
-                        .text; // Get the username from the text field
-                    String password = passwordController
-                        .text; // Get the password from the text field
-
-                    // Check if the username already exists in the box
-                    if (box.containsKey(username)) {
-                      // If the username already exists, display a snackbar
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(
-                            'Username already exists! Please choose a different username.',
-                          ),
-                        ),
-                      );
-                    } else {
-                      // If the username does not exist, store the new username-password pair in the Hive box
-                      box.put(username, password);
-                      print(
-                          'Signup successful! Username: $username, Password: $password');
-                    }
-                  },
-                  child: const Text('Signup'),
-                ),
-                const SizedBox(height: 20.0),
-                ElevatedButton(
-                  onPressed: () {
-                    // Navigate back to login page
-                    Navigator.pop(context);
-                  },
-                  child: const Text('Back to Login'),
-                ),
-                const SizedBox(height: 20.0),
-                ElevatedButton(
-                  onPressed: () {
-                    // Navigate back to home page
-                    Navigator.popUntil(context, ModalRoute.withName('/'));
-                  },
-                  child: const Text('Back to Home'),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
 class Dashboard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -503,26 +518,30 @@ class Dashboard extends StatelessWidget {
         title: Text('Dashboard'),
       ),
       body: FutureBuilder(
-        future: Hive.openBox('users'),
+        future: Hive.openBox('users1'), // Open the users1 box
         builder: (BuildContext context, AsyncSnapshot<Box> snapshot) {
           if (snapshot.connectionState == ConnectionState.done) {
             if (snapshot.hasData) {
-              Box usersBox = snapshot.data!;
-              List<String> users = usersBox.keys.cast<String>().toList();
+              Box users1Box = snapshot.data!;
+              List<String> users = users1Box.keys.cast<String>().toList();
               return ListView.builder(
                 itemCount: users.length,
                 itemBuilder: (BuildContext context, int index) {
                   String username = users[index];
+                  String location = users1Box.get(username, defaultValue: '');
 
-                  String location = usersBox.get(username, defaultValue: '14');
                   return ListTile(
-                    title: Text(username),
+                    title: Text(
+                      username,
+                      style: TextStyle(
+                          color: Colors.black), // Set text color to black
+                    ),
                     subtitle: Text('Location: $location'),
                     trailing: IconButton(
                       icon: Icon(Icons.delete),
                       onPressed: () {
                         // Delete the username from the Hive box
-                        usersBox.delete(username);
+                        users1Box.delete(username);
                         // Rebuild the UI to reflect the changes
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
