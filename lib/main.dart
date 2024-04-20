@@ -286,42 +286,53 @@ class _EstimatedWeightPageState extends State<EstimatedWeightPage> {
       appBar: AppBar(
         title: Text('Estimated Weight Calculator'),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
-            TextField(
-              controller: gsmController,
-              keyboardType: TextInputType.number,
-              decoration: InputDecoration(labelText: 'GSM'),
-            ),
-            TextField(
-              controller: papersController,
-              keyboardType: TextInputType.number,
-              decoration: InputDecoration(labelText: 'Number of Papers'),
-            ),
-            TextField(
-              controller: lengthController,
-              keyboardType: TextInputType.number,
-              decoration: InputDecoration(labelText: 'Length (in meters)'),
-            ),
-            TextField(
-              controller: widthController,
-              keyboardType: TextInputType.number,
-              decoration: InputDecoration(labelText: 'Width (in meters)'),
-            ),
-            SizedBox(height: 20.0),
-            ElevatedButton(
-              onPressed: calculateEstimatedWeight,
-              child: Text('Calculate'),
-            ),
-            SizedBox(height: 20.0),
-            Text(
-              'Estimated Weight: ${estimatedWeight.toStringAsFixed(2)} kg',
-              style: TextStyle(fontSize: 18.0),
-            ),
-          ],
+      body: Container(
+        decoration: BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage(
+                'images/estimate.jpeg'), // Path to your background image
+            fit: BoxFit.cover,
+          ),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: <Widget>[
+              TextField(
+                controller: gsmController,
+                keyboardType: TextInputType.number,
+                decoration: InputDecoration(
+                  labelText: 'GSM',
+                ),
+              ),
+              TextField(
+                controller: papersController,
+                keyboardType: TextInputType.number,
+                decoration: InputDecoration(labelText: 'Number of Papers'),
+              ),
+              TextField(
+                controller: lengthController,
+                keyboardType: TextInputType.number,
+                decoration: InputDecoration(labelText: 'Length (in meters)'),
+              ),
+              TextField(
+                controller: widthController,
+                keyboardType: TextInputType.number,
+                decoration: InputDecoration(labelText: 'Width (in meters)'),
+              ),
+              SizedBox(height: 20.0),
+              ElevatedButton(
+                onPressed: calculateEstimatedWeight,
+                child: Text('Calculate'),
+              ),
+              SizedBox(height: 20.0),
+              Text(
+                'Estimated Weight: ${estimatedWeight.toStringAsFixed(2)} kg',
+                style: TextStyle(fontSize: 18.0),
+              ),
+            ],
+          ),
         ),
       ),
     );
