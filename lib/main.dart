@@ -2,13 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:hive/hive.dart';
 
-// ElevatedButton(
-//              onPressed: () {
-//              Navigator.pushNamed(context, '/Sell');
-//          },
-//        child: Text('Sell Waste'),
-//    ),
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   var directory = await getApplicationDocumentsDirectory();
@@ -104,8 +97,6 @@ class HomePage extends StatelessWidget {
     );
   }
 }
-
-//admin page
 
 class AdminPage extends StatelessWidget {
   final TextEditingController usernameController = TextEditingController();
@@ -209,8 +200,7 @@ class _LoginPageState extends State<LoginPage> {
       body: Container(
         decoration: const BoxDecoration(
           image: DecorationImage(
-            image:
-                AssetImage('images/bg2.jpg'), // Path to your background image
+            image: AssetImage('images/bg2.jpg'),
             fit: BoxFit.cover,
           ),
         ),
@@ -248,12 +238,10 @@ class _LoginPageState extends State<LoginPage> {
                     String enteredUsername = usernameController.text;
                     String enteredPassword = passwordController.text;
 
-                    String storedUsername =
-                        box.get(enteredUsername, defaultValue: '');
                     String storedPassword =
                         box.get(enteredUsername, defaultValue: '');
 
-                    if (enteredUsername == storedUsername &&
+                    if (storedPassword.isNotEmpty &&
                         enteredPassword == storedPassword) {
                       Navigator.pushNamed(context, '/home');
                     } else {
@@ -441,7 +429,6 @@ class _SignupPageState extends State<SignupPage> {
   }
 }
 
-//dashboard
 class Dashboard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -459,8 +446,22 @@ class Dashboard extends StatelessWidget {
               return ListView.builder(
                 itemCount: users.length,
                 itemBuilder: (BuildContext context, int index) {
+                  String username = users[index];
                   return ListTile(
-                    title: Text(users[index]),
+                    title: Text(username),
+                    trailing: IconButton(
+                      icon: Icon(Icons.delete),
+                      onPressed: () {
+                        // Delete the username from the Hive box
+                        usersBox.delete(username);
+                        // Rebuild the UI to reflect the changes
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('User $username deleted.'),
+                          ),
+                        );
+                      },
+                    ),
                   );
                 },
               );
