@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:hive/hive.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  var path = await getApplicationDocumentsDirectory();
+  var directory = await getApplicationDocumentsDirectory();
+  Hive.init(directory.path);
+  await Hive.openBox('users');
   runApp(MyApp());
 }
 
@@ -164,7 +167,8 @@ class LoginPage extends StatelessWidget {
 }
 
 class SignupPage extends StatelessWidget {
-  const SignupPage({Key? key}) : super(key: key);
+  final TextEditingController usernameController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -198,15 +202,15 @@ class SignupPage extends StatelessWidget {
                 ),
                 const SizedBox(height: 20.0),
                 TextField(
-                  style: const TextStyle(
-                    color: Colors.white, // Text color of the input field
+                  style: TextStyle(
+                    color: Colors.black, // Set text color to black
                     fontWeight: FontWeight.bold, // Bold font weight
                   ),
                   decoration: InputDecoration(
                     filled: true,
                     fillColor: Colors.white, // Background color
                     labelText: 'Username',
-                    labelStyle: const TextStyle(
+                    labelStyle: TextStyle(
                       color: Colors.black, // Text color of the label
                       fontWeight: FontWeight.bold, // Bold font weight
                     ),
@@ -219,6 +223,7 @@ class SignupPage extends StatelessWidget {
                 ),
                 const SizedBox(height: 20.0),
                 TextField(
+                  controller: passwordController,
                   style: const TextStyle(
                     color: Colors.white, // Text color of the input field
                     fontWeight: FontWeight.bold, // Bold font weight
@@ -241,8 +246,29 @@ class SignupPage extends StatelessWidget {
                 ),
                 const SizedBox(height: 20.0),
                 ElevatedButton(
-                  onPressed: () {
-                    // Add signup logic here
+                  onPressed: () async {
+                    var box = await Hive.openBox(
+                        'users'); // Open a Hive box to store user data
+                    String username = usernameController
+                        .text; // Get the username from the text field
+                    String password = passwordController
+                        .text; // Get the password from the text field
+
+                    // Check if the username already exists in the box
+                    if (box.containsKey(username)) {
+                      // If the username already exists, display a snackbar
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                              'Username already exists! Please choose a different username.'),
+                        ),
+                      );
+                    } else {
+                      // If the username does not exist, store the new username-password pair in the Hive box
+                      box.put(username, password);
+                      print(
+                          'Signup successful! Username: $username, Password: $password');
+                    }
                   },
                   child: const Text('Signup'),
                 ),
