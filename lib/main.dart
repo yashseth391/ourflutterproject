@@ -2,6 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:hive/hive.dart';
 
+// ElevatedButton(
+//              onPressed: () {
+//              Navigator.pushNamed(context, '/Sell');
+//          },
+//        child: Text('Sell Waste'),
+//    ),
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   var directory = await getApplicationDocumentsDirectory();
@@ -26,6 +33,7 @@ class MyApp extends StatelessWidget {
         '/signup': (context) => SignupPage(),
         '/Sell': (context) => SellWastePage(),
         '/Estimate': (context) => EstimatedWeightPage(),
+        '/Admin': (context) => AdminPage(),
       },
     );
   }
@@ -58,7 +66,13 @@ class HomePage extends StatelessWidget {
                   fontWeight: FontWeight.w700,
                 ),
               ),
-              const SizedBox(height: 20.0),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.pushNamed(context, '/Admin');
+                },
+                child: Text('FOR ADMIN '),
+              ),
+              const SizedBox(height: 40.0),
               ElevatedButton(
                 onPressed: () {
                   Navigator.pushNamed(context, '/login');
@@ -79,12 +93,6 @@ class HomePage extends StatelessWidget {
               ),
               ElevatedButton(
                 onPressed: () {
-                  Navigator.pushNamed(context, '/Sell');
-                },
-                child: Text('Sell Waste'),
-              ),
-              ElevatedButton(
-                onPressed: () {
                   Navigator.pushNamed(context, '/About');
                 },
                 child: Text('About us'),
@@ -97,7 +105,104 @@ class HomePage extends StatelessWidget {
   }
 }
 
-class LoginPage extends StatelessWidget {
+//admin page
+
+class AdminPage extends StatelessWidget {
+  final TextEditingController usernameController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Container(
+        decoration: const BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage('images/bg2.jpg'),
+            fit: BoxFit.cover,
+          ),
+        ),
+        child: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                const SizedBox(height: 20.0),
+                TextField(
+                  controller: usernameController,
+                  decoration: const InputDecoration(
+                    filled: true,
+                    fillColor: Colors.white,
+                    labelText: 'Username',
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+                const SizedBox(height: 20.0),
+                TextField(
+                  controller: passwordController,
+                  obscureText: true,
+                  decoration: const InputDecoration(
+                    filled: true,
+                    fillColor: Colors.white,
+                    labelText: 'Password',
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+                const SizedBox(height: 20.0),
+                ElevatedButton(
+                  onPressed: () async {
+                    String enteredUsername = usernameController.text;
+                    String enteredPassword = passwordController.text;
+
+                    // Check if the user is an admin
+                    if (enteredUsername == 'yash' &&
+                        enteredPassword == 'yash') {
+                      // Navigate to a new page where you can add functionality later
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => Dashboard()),
+                      );
+                    } else {
+                      // Display error message
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return AlertDialog(
+                            title: Text('Error'),
+                            content: Text('Invalid username or password.'),
+                            actions: [
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                },
+                                child: Text('OK'),
+                              ),
+                            ],
+                          );
+                        },
+                      );
+                    }
+                  },
+                  child: const Text('Login'),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class LoginPage extends StatefulWidget {
+  @override
+  _LoginPageState createState() => _LoginPageState();
+}
+
+class _LoginPageState extends State<LoginPage> {
+  final TextEditingController usernameController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -116,7 +221,8 @@ class LoginPage extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
                 const SizedBox(height: 20.0),
-                const TextField(
+                TextField(
+                  controller: usernameController,
                   decoration: InputDecoration(
                     filled: true,
                     fillColor: Colors.white,
@@ -125,7 +231,8 @@ class LoginPage extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 20.0),
-                const TextField(
+                TextField(
+                  controller: passwordController,
                   obscureText: true,
                   decoration: InputDecoration(
                     filled: true,
@@ -136,8 +243,38 @@ class LoginPage extends StatelessWidget {
                 ),
                 const SizedBox(height: 20.0),
                 ElevatedButton(
-                  onPressed: () {
-                    // Add login logic here
+                  onPressed: () async {
+                    var box = await Hive.openBox('users');
+                    String enteredUsername = usernameController.text;
+                    String enteredPassword = passwordController.text;
+
+                    String storedUsername =
+                        box.get(enteredUsername, defaultValue: '');
+                    String storedPassword =
+                        box.get(enteredUsername, defaultValue: '');
+
+                    if (enteredUsername == storedUsername &&
+                        enteredPassword == storedPassword) {
+                      Navigator.pushNamed(context, '/home');
+                    } else {
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return AlertDialog(
+                            title: Text('Error'),
+                            content: Text('Invalid username or password.'),
+                            actions: [
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                },
+                                child: Text('OK'),
+                              ),
+                            ],
+                          );
+                        },
+                      );
+                    }
                   },
                   child: const Text('Login'),
                 ),
@@ -166,7 +303,12 @@ class LoginPage extends StatelessWidget {
   }
 }
 
-class SignupPage extends StatelessWidget {
+class SignupPage extends StatefulWidget {
+  @override
+  _SignupPageState createState() => _SignupPageState();
+}
+
+class _SignupPageState extends State<SignupPage> {
   final TextEditingController usernameController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
 
@@ -206,6 +348,7 @@ class SignupPage extends StatelessWidget {
                     color: Colors.black, // Set text color to black
                     fontWeight: FontWeight.bold, // Bold font weight
                   ),
+                  controller: usernameController,
                   decoration: InputDecoration(
                     filled: true,
                     fillColor: Colors.white, // Background color
@@ -260,7 +403,8 @@ class SignupPage extends StatelessWidget {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
                           content: Text(
-                              'Username already exists! Please choose a different username.'),
+                            'Username already exists! Please choose a different username.',
+                          ),
                         ),
                       );
                     } else {
@@ -292,6 +436,45 @@ class SignupPage extends StatelessWidget {
             ),
           ),
         ),
+      ),
+    );
+  }
+}
+
+//dashboard
+class Dashboard extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Dashboard'),
+      ),
+      body: FutureBuilder(
+        future: Hive.openBox('users'),
+        builder: (BuildContext context, AsyncSnapshot<Box> snapshot) {
+          if (snapshot.connectionState == ConnectionState.done) {
+            if (snapshot.hasData) {
+              Box usersBox = snapshot.data!;
+              List<String> users = usersBox.keys.cast<String>().toList();
+              return ListView.builder(
+                itemCount: users.length,
+                itemBuilder: (BuildContext context, int index) {
+                  return ListTile(
+                    title: Text(users[index]),
+                  );
+                },
+              );
+            } else {
+              return Center(
+                child: Text('No users found.'),
+              );
+            }
+          } else {
+            return Center(
+              child: CircularProgressIndicator(),
+            );
+          }
+        },
       ),
     );
   }
