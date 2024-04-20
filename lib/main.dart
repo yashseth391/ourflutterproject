@@ -33,7 +33,7 @@ class HomePage extends StatelessWidget {
         title: const Text('Home'),
       ),
       body: Container(
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           image: DecorationImage(
             image:
                 AssetImage('images/home.jpg'), // Path to your background image
