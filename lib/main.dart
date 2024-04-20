@@ -18,6 +18,8 @@ class MyApp extends StatelessWidget {
         '/': (context) => HomePage(),
         '/login': (context) => LoginPage(),
         '/signup': (context) => SignupPage(),
+        '/Sell': (context) => SellWastePage(),
+        '/Estimate': (context) => EstimatedWeightPage(),
       },
     );
   }
@@ -28,31 +30,61 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Home'),
+        title: const Text('Home'),
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text(
-              'Home Page',
-              style: TextStyle(fontSize: 24.0),
-            ),
-            SizedBox(height: 20.0),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.pushNamed(context, '/login');
-              },
-              child: Text('Login'),
-            ),
-            SizedBox(height: 20.0),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.pushNamed(context, '/signup');
-              },
-              child: Text('Sign Up'),
-            ),
-          ],
+      body: Container(
+        decoration: BoxDecoration(
+          image: DecorationImage(
+            image:
+                AssetImage('images/home.jpg'), // Path to your background image
+            fit: BoxFit.cover,
+          ),
+        ),
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              const Text(
+                'PAYDIRT',
+                style: TextStyle(
+                  fontSize: 30.0,
+                  color: Colors.black,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              const SizedBox(height: 20.0),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.pushNamed(context, '/login');
+                },
+                child: Text('Login'),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.pushNamed(context, '/signup');
+                },
+                child: Text('Sign Up'),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.pushNamed(context, '/Estimate');
+                },
+                child: Text('Estimated weight'),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.pushNamed(context, '/Sell');
+                },
+                child: Text('Sell Waste'),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.pushNamed(context, '/About');
+                },
+                child: Text('About us'),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -229,6 +261,150 @@ class SignupPage extends StatelessWidget {
                 ),
               ],
             ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class EstimatedWeightPage extends StatefulWidget {
+  @override
+  _EstimatedWeightPageState createState() => _EstimatedWeightPageState();
+}
+
+class _EstimatedWeightPageState extends State<EstimatedWeightPage> {
+  TextEditingController gsmController = TextEditingController();
+  TextEditingController papersController = TextEditingController();
+  TextEditingController lengthController = TextEditingController();
+  TextEditingController widthController = TextEditingController();
+  double estimatedWeight = 0.0;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Estimated Weight Calculator'),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(20.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: <Widget>[
+            TextField(
+              controller: gsmController,
+              keyboardType: TextInputType.number,
+              decoration: InputDecoration(labelText: 'GSM'),
+            ),
+            TextField(
+              controller: papersController,
+              keyboardType: TextInputType.number,
+              decoration: InputDecoration(labelText: 'Number of Papers'),
+            ),
+            TextField(
+              controller: lengthController,
+              keyboardType: TextInputType.number,
+              decoration: InputDecoration(labelText: 'Length (in meters)'),
+            ),
+            TextField(
+              controller: widthController,
+              keyboardType: TextInputType.number,
+              decoration: InputDecoration(labelText: 'Width (in meters)'),
+            ),
+            SizedBox(height: 20.0),
+            ElevatedButton(
+              onPressed: calculateEstimatedWeight,
+              child: Text('Calculate'),
+            ),
+            SizedBox(height: 20.0),
+            Text(
+              'Estimated Weight: ${estimatedWeight.toStringAsFixed(2)} kg',
+              style: TextStyle(fontSize: 18.0),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void calculateEstimatedWeight() {
+    double gsm = double.tryParse(gsmController.text) ?? 0.0;
+    int papers = int.tryParse(papersController.text) ?? 0;
+    double length = double.tryParse(lengthController.text) ?? 0.0;
+    double width = double.tryParse(widthController.text) ?? 0.0;
+
+    double weight = (gsm * papers * length * width) / 1000;
+    setState(() {
+      estimatedWeight = weight;
+    });
+  }
+}
+
+class SellWastePage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Sell Waste'),
+      ),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            ElevatedButton(
+              onPressed: () {
+                // Navigate to page to sell paper waste
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => SellPaperWastePage()),
+                );
+              },
+              child: Text('Sell Paper Waste'),
+            ),
+            SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () {
+                // Navigate to page to sell other waste
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => SellOtherWastePage()),
+                );
+              },
+              child: Text('Sell Other Waste'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class SellPaperWastePage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Sell Paper Waste'),
+      ),
+      body: Center(
+        child: Text('This is the page to sell paper waste.'),
+      ),
+    );
+  }
+}
+
+class SellOtherWastePage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Sell Other Waste'),
+      ),
+      body: Center(
+        child: Text(
+          'Sorry currently we are not dealing in other wastes ,we will let you know when we will start ',
+          style: TextStyle(
+            fontSize: 20.00,
           ),
         ),
       ),
