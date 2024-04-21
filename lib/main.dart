@@ -93,27 +93,16 @@ class _UserPageState extends State<UserPage> {
                 // Open the Hive box for users1
                 var users1Box = await Hive.openBox('users1');
 
-                // Check if the user has already responded
-                if (users1Box.containsKey(username)) {
-                  // If the user has already responded, show a message
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(
-                          'Response submitted.You can get approximately ₹$approximateAmount. In a coming week if you want to make new entry do not make it our worked will do that after reaching to you'),
-                    ),
-                  );
-                } else {
-                  // Store the username and location together in the users1 box
-                  users1Box.put(username, location);
+                // Store the username and location together in the users1 box
+                users1Box.put(username, location);
 
-                  // Display confirmation message
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(
-                          'Response submitted.You can get approximately ₹$approximateAmount. In a coming week if you want to make new entry do not make it our worked will do that after reaching to you'),
-                    ),
-                  );
-                }
+                // Display confirmation message
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                        'Response submitted.You can get approximately ₹$approximateAmount. In a coming week if you want to make new entry do not make it our worked will do that after reaching to you'),
+                  ),
+                );
               },
               child: Text('Submit'),
             ),
@@ -297,6 +286,7 @@ class _SignupPageState extends State<SignupPage> {
                     } else {
                       // If the username does not exist, store the new username-password pair in the Hive box
                       box.put(username, password);
+
                       print(
                           'Signup successful! Username: $username, Password: $password');
                     }
@@ -592,7 +582,7 @@ class Dashboard extends StatelessWidget {
                     //       color: Color.fromARGB(
                     //           255, 74, 74, 74)), // Set text color to black
                     // ),
-                    subtitle: Text('Location: $location'),
+                    subtitle: Text('pickup Location: $location'),
                     trailing: IconButton(
                       icon: Icon(Icons.delete),
                       onPressed: () {
