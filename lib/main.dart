@@ -93,16 +93,27 @@ class _UserPageState extends State<UserPage> {
                 // Open the Hive box for users1
                 var users1Box = await Hive.openBox('users1');
 
-                // Store the username and location together in the users1 box
-                users1Box.put(username, location);
+                // Check if the user has already responded
+                if (users1Box.containsKey(username)) {
+                  // If the user has already responded, show a message
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                          'Response submitted.You can get approximately ₹$approximateAmount. In a coming week if you want to make new entry do not make it our worked will do that after reaching to you'),
+                    ),
+                  );
+                } else {
+                  // Store the username and location together in the users1 box
+                  users1Box.put(username, location);
 
-                // Display confirmation message
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(
-                        'Response submitted. You can get approximately ₹$approximateAmount.'),
-                  ),
-                );
+                  // Display confirmation message
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                          'Response submitted.You can get approximately ₹$approximateAmount. In a coming week if you want to make new entry do not make it our worked will do that after reaching to you'),
+                    ),
+                  );
+                }
               },
               child: Text('Submit'),
             ),
@@ -510,6 +521,48 @@ class _LoginPageState extends State<LoginPage> {
   }
 }
 
+//details page
+
+class DetailsPage extends StatelessWidget {
+  final String username;
+  final double weight;
+  final String location;
+
+  DetailsPage(
+      {required this.username, required this.weight, required this.location});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Details'),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(20.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Username: $username',
+              style: TextStyle(fontSize: 18),
+            ),
+            SizedBox(height: 10),
+            Text(
+              'Weight Collected: $weight kg',
+              style: TextStyle(fontSize: 18),
+            ),
+            SizedBox(height: 10),
+            Text(
+              'Location: $location',
+              style: TextStyle(fontSize: 18),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 class Dashboard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -523,27 +576,28 @@ class Dashboard extends StatelessWidget {
           if (snapshot.connectionState == ConnectionState.done) {
             if (snapshot.hasData) {
               Box users1Box = snapshot.data!;
-              Box usersBox = snapshot.data!;
-              List<String> users = usersBox.keys.cast<String>().toList();
+              var users1List =
+                  users1Box.keys.toList(); // Get the list of usernames
+
               return ListView.builder(
-                itemCount: users.length,
+                itemCount: users1List.length,
                 itemBuilder: (BuildContext context, int index) {
-                  String username = users[index];
+                  String username = users1List[index];
                   String location = users1Box.get(username, defaultValue: '');
 
                   return ListTile(
-                    title: Text(
-                      'username is $username',
-                      style: TextStyle(
-                          color: Color.fromARGB(
-                              255, 74, 74, 74)), // Set text color to black
-                    ),
+                    // title: Text(
+                    //   'Username: $username',
+                    //   style: TextStyle(
+                    //       color: Color.fromARGB(
+                    //           255, 74, 74, 74)), // Set text color to black
+                    // ),
                     subtitle: Text('Location: $location'),
                     trailing: IconButton(
                       icon: Icon(Icons.delete),
                       onPressed: () {
-                        // Delete the username from the Hive box
-                        usersBox.delete(username);
+                        // Delete the username from the users1 box
+                        users1Box.delete(username);
                         // Rebuild the UI to reflect the changes
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
