@@ -1,16 +1,19 @@
-# currency_converter
 
-A new Flutter project.
+# paydirt
 
-## Getting Started
+Our startup offers a comprehensive solution to the pressing issue of waste management.Most of the recyclable waste goes in landfills, we aim at reducing that number.
 
-This project is a starting point for a Flutter application.
+Our solution
+We aim at creating the system using which people can provide their recyclable waste(for now only paper waste) to us in exchange of gifts and cash prizes
+Recyclable waste goes through 4 mediators before it is finally sold to recycling companies.we aim to directly sell the waste to companies in bulk hence maximizing profit.
 
-A few resources to get you started if this is your first Flutter project:
+Our business model
+Creating an app for the customers using which they can enter the amount of waste they can and we will come to collect it
+Then we will store the waste in warehouses and sell it in bulk directly to large recycling companies.
+Administrator will have a web portal using which they can track all the profit and amount of different kinds of waste people sell in large numbers. Hence analyse trends and try to maximize profit
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+ 
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+
+
+

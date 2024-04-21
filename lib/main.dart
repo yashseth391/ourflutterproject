@@ -523,7 +523,8 @@ class Dashboard extends StatelessWidget {
           if (snapshot.connectionState == ConnectionState.done) {
             if (snapshot.hasData) {
               Box users1Box = snapshot.data!;
-              List<String> users = users1Box.keys.cast<String>().toList();
+              Box usersBox = snapshot.data!;
+              List<String> users = usersBox.keys.cast<String>().toList();
               return ListView.builder(
                 itemCount: users.length,
                 itemBuilder: (BuildContext context, int index) {
@@ -532,16 +533,17 @@ class Dashboard extends StatelessWidget {
 
                   return ListTile(
                     title: Text(
-                      username,
+                      'username is $username',
                       style: TextStyle(
-                          color: Colors.black), // Set text color to black
+                          color: Color.fromARGB(
+                              255, 74, 74, 74)), // Set text color to black
                     ),
                     subtitle: Text('Location: $location'),
                     trailing: IconButton(
                       icon: Icon(Icons.delete),
                       onPressed: () {
                         // Delete the username from the Hive box
-                        users1Box.delete(username);
+                        usersBox.delete(username);
                         // Rebuild the UI to reflect the changes
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
